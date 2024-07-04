@@ -30,7 +30,7 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
-
+        
         // Log the received request body
         console.log('Request Body:', req.body);
 
@@ -48,16 +48,15 @@ exports.login = async (req, res) => {
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
         console.log('Password match result:', isPasswordCorrect);
-
+        
         if (!isPasswordCorrect) {
             console.log('Password did not match');
             return res.status(401).json({ status: 'fail', message: 'Invalid username or password' });
         }
 
         console.log('Password matched');
-        generateAuthToken(user._id, res);
+        generateAuthToken(user, res);
         console.log('User logged in', user.username);
-        res.status(200).json({ status: 'success', data: { user } });
     } catch (error) {
         console.log('Error during login:', error);
         res.status(400).json({ status: 'fail', message: error.message });
