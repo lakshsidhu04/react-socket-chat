@@ -4,12 +4,12 @@ import { useUser } from '../contexts/UserContext';
 
 const SideBar = ({ setTargetUser }) => {
     const [users, setUsers] = useState([]);
-    const { currentUser } = useUser();
+    const { user } = useUser();
     
     useEffect(() => {
         fetchUsers();
-        console.log('Current User at sidebar:', currentUser);
-    }, [currentUser]);
+        console.log('Current User at sidebar:', user);
+    }, [user]);
 
     const fetchUsers = async () => {
         try {
@@ -31,10 +31,10 @@ const SideBar = ({ setTargetUser }) => {
     };
 
     const handleUserClick = (user) => {
-        if (currentUser && user._id !== currentUser._id) {
+        if (user && user._id !== user._id) {
             setTargetUser(user);
-            startChat({ fromUserId: currentUser._id, toUserId: user._id });
-        } else if (currentUser && user._id === currentUser._id) {
+            startChat({ fromUserId: user._id, toUserId: user._id });
+        } else if (user && user._id === user._id) {
             console.log('Cannot chat with yourself');
         }
     };

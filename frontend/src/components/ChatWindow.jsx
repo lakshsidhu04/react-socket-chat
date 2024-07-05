@@ -3,11 +3,11 @@ import { initSocket } from '../services/ChatService';
 import { useUser } from '../contexts/UserContext';
 
 const ChatWindow = ({ targetUser }) => {
-    const { currentUser } = useUser();
+    const { user } = useUser();
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState('');
     const [socket, setSocket] = useState(null);
-
+    
     useEffect(() => {
         const socketInstance = initSocket();
         setSocket(socketInstance);
@@ -22,17 +22,17 @@ const ChatWindow = ({ targetUser }) => {
     }, []);
 
     useEffect(() => {
-        if (currentUser && targetUser && socket) {
-            const roomName = [currentUser._id, targetUser._id].sort().join('_');
+        if (user && targetUser && socket) {
+            const roomName = [user._id, targetUser._id].sort().join('_');
             socket.emit('joinRoom', { roomName });
         }
-    }, [currentUser, targetUser, socket]);
+    }, [user, targetUser, socket]);
 
     const handleSendMessage = () => {
-        if (message.trim() !== '' && currentUser && targetUser && socket) {
-            const roomName = [currentUser._id, targetUser._id].sort().join('_');
+        if (message.trim() !== '' && user && targetUser && socket) {
+            const roomName = [user._id, targetUser._id].sort().join('_');
             const msg = {
-                from: currentUser.name,
+                from: user.name,
                 text: message,
                 room: roomName,
             };

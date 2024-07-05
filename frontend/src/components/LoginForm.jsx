@@ -3,16 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 
 const LoginForm = () => {
-    const { setCurrentUser, currentUser } = useUser();
+    const { setUser, user } = useUser();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (currentUser) {
+        if (user) {
             navigate('/chat');
         }
-    }, [currentUser, navigate]);
+    }, [user, navigate]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -29,7 +29,7 @@ const LoginForm = () => {
                 throw new Error('Login failed');
             }
             const data = await response.json();
-            setCurrentUser(data.user);
+            setUser(data.user);
         } catch (error) {
             console.error('Login error:', error);
         }
