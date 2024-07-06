@@ -35,12 +35,11 @@ app.use('/api/users', UserRouter);
 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
-
     socket.on('joinRoom', ({ roomName }) => {
         socket.join(roomName);
         console.log(`User ${socket.id} joined room: ${roomName}`);
     });
-
+    
     socket.on('sendMessage', (msg, callback) => {
         const roomName = msg.room;
         console.log(`Received sendMessage event for room ${roomName}: ${msg.text}`);

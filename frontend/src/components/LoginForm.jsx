@@ -1,19 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import { useSocket } from '../contexts/SocketContext';
 
 const LoginForm = () => {
     const { setUser, user } = useUser();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const { connectSocket, socket } = useSocket();
 
     useEffect(() => {
         if (user) {
+            const userSocket = connectSocket(user._id);
+            console.log('Connected the user with socket:', userSocket);
             navigate('/chat');
         }
-    }, [user, navigate]);
-
+    }, [user, connectSocket, navigate]);
+    
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
@@ -30,6 +34,7 @@ const LoginForm = () => {
             }
             const data = await response.json();
             setUser(data.user);
+
         } catch (error) {
             console.error('Login error:', error);
         }

@@ -1,4 +1,3 @@
-// contexts/SocketContext.jsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
@@ -14,17 +13,45 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
+    const [onlineUsers, setOnlineUsers] = useState([]); 
 
-    useEffect(() => {
-        // Replace with your socket server URL
-        const newSocket = io('http://localhost:3030');
-        setSocket(newSocket);
+    const connectSocket = (userId) => {
+        if (!socket) {
+            const newSocket = io('http://localhost:3030', {
+                query: { userId }
+            });
 
-        return () => newSocket.close();
-    }, []);
+            newSocket.on('connect', () => {
+                console.log('New socket connected with id:', newSocket.id);
+                setSocket(newSocket);
+                console.log('User', userId, 'connected with socketid', newSocket.id);
+            });
+            
+            newSocket.on('onlineUsers', (users) => {
+                console.log('Online users:', users);
+                setOnlineUsers(users);
+            })
+            return newSocket;
+        }
+    };
+
+    const disconnectSocket = () => {
+        if (socket) {
+            socket.disconnect();
+            setSocket(null);
+        }
+    };
     
+    useEffect(() => {
+        return () => {
+            if (socket) {
+                socket.disconnect();
+            }
+        };
+    }, [socket]);
+
     return (
-        <SocketContext.Provider value={socket}>
+        <SocketContext.Provider value={{ socket, connectSocket, disconnectSocket }}>
             {children}
         </SocketContext.Provider>
     );
