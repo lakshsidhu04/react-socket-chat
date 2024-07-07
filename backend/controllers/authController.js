@@ -17,10 +17,9 @@ exports.signup = async (req, res) => {
         const newUser = await User.create({ name, username, password: hashedPassword });
         console.log('created user');
         if (newUser) {
-            generateAuthToken(newUser._id, res);
+            generateAuthToken(newUser, res);
             await newUser.save();
             console.log('User created successfully');
-            res.status(201).json({ status: 'success', data: { user: newUser } });
         }
     } catch (error) {
         res.status(400).json({ status: 'fail', message: error.message });

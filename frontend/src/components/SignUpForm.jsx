@@ -1,101 +1,111 @@
-import { Link } from "react-router-dom";
-import GenderCheckbox from "./GenderCheckbox";
-import { useState } from "react";
-import useSignup from "../../hooks/useSignup";
+import React, { useState,useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; 
+import { useUser } from '../contexts/UserContext';
+import { useSocket } from '../contexts/SocketContext';
+import { Link } from 'react-router-dom';
+const SignUpForm = () => {
+    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const { setUser, user } = useUser();
+    const navigate = useNavigate();
+    const { connectSocket } = useSocket();
+    
 
-const SignUp = () => {
-    const [inputs, setInputs] = useState({
-        fullName: "",
-        username: "",
-        password: "",
-        confirmPassword: "",
-        gender: "",
-    });
+    useEffect(() => {
+        if (user) {
+            connectSocket(user);
+            navigate('/chat');
+        }
+    }, [user, connectSocket, navigate]);
 
-    const { loading, signup } = useSignup();
-
-    const handleCheckboxChange = (gender) => {
-        setInputs({ ...inputs, gender });
-    };
-
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await signup(inputs);
+
+        if (!name || !username || !password || !confirmPassword) {
+            setError('All fields are required');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:3030/api/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name,
+                    username,
+                    password,
+                    confirmPassword,
+                }),
+            });
+
+            if (!response.ok) {
+                setError('Sign up failed. Please try again.');
+                return;
+            }
+
+            const data = await response.json();
+            console.log('Sign up response:', data);
+            setUser(data.user);
+
+        } catch (error) {
+            console.error('Error during sign up:', error);
+            setError('Error during sign up. Please try again.');
+        }
     };
 
     return (
-        <div className='flex flex-col items-center justify-center min-w-96 mx-auto'>
-            <div className='w-full p-6 rounded-lg shadow-md bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0'>
-                <h1 className='text-3xl font-semibold text-center text-gray-300'>
-                    Sign Up <span className='text-blue-500'> ChatApp</span>
-                </h1>
-
-                <form onSubmit={handleSubmit}>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8">
+                <div>
+                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign Up</h2>
+                </div>
+                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+                    {error && <p className="text-red-500 text-xs italic">{error}</p>}
+                    <input
+                        type="text"
+                        placeholder="Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    />
                     <div>
-                        <label className='label p-2'>
-                            <span className='text-base label-text'>Full Name</span>
-                        </label>
-                        <input
-                            type='text'
-                            placeholder='John Doe'
-                            className='w-full input input-bordered  h-10'
-                            value={inputs.fullName}
-                            onChange={(e) => setInputs({ ...inputs, fullName: e.target.value })}
-                        />
-                    </div>
-
-                    <div>
-                        <label className='label p-2 '>
-                            <span className='text-base label-text'>Username</span>
-                        </label>
-                        <input
-                            type='text'
-                            placeholder='johndoe'
-                            className='w-full input input-bordered h-10'
-                            value={inputs.username}
-                            onChange={(e) => setInputs({ ...inputs, username: e.target.value })}
-                        />
-                    </div>
-
-                    <div>
-                        <label className='label'>
-                            <span className='text-base label-text'>Password</span>
-                        </label>
-                        <input
-                            type='password'
-                            placeholder='Enter Password'
-                            className='w-full input input-bordered h-10'
-                            value={inputs.password}
-                            onChange={(e) => setInputs({ ...inputs, password: e.target.value })}
-                        />
-                    </div>
-                    
-                    <div>
-                        <label className='label'>
-                            <span className='text-base label-text'>Confirm Password</span>
-                        </label>
-                        <input
-                            type='password'
-                            placeholder='Confirm Password'
-                            className='w-full input input-bordered h-10'
-                            value={inputs.confirmPassword}
-                            onChange={(e) => setInputs({ ...inputs, confirmPassword: e.target.value })}
-                        />
-                    </div>
-
-                    <GenderCheckbox onCheckboxChange={handleCheckboxChange} selectedGender={inputs.gender} />
-                    
-                    <Link
-                        to={"/login"}
-                        className='text-sm hover:underline hover:text-blue-600 mt-2 inline-block'
-                        href='#'
-                    >
-                        Already have an account?
-                    </Link>
-
-                    <div>
-                        <button className='btn btn-block btn-sm mt-2 border border-slate-700' disabled={loading}>
-                            {loading ? <span className='loading loading-spinner'></span> : "Sign Up"}
+                        <button
+                            type="submit"
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Sign Up
                         </button>
                     </div>
                 </form>
@@ -103,6 +113,5 @@ const SignUp = () => {
         </div>
     );
 };
-export default SignUp;
 
-
+export default SignUpForm;

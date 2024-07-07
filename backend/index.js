@@ -36,35 +36,33 @@ app.use('/api/users', UserRouter);
 const onlineUsers = new Map();
 
 io.on('connection', (socket) => {
-    const userId = socket.handshake.query.userId;
-    onlineUsers.set(userId, socket.id);
-    io.emit('onlineUsers', Array.from(onlineUsers.keys()));
+    const user = JSON.parse(socket.handshake.query.user);
+    const userId = user._id;
+    const username = user.username;
+    onlineUsers.set(userId, { socketId: socket.id, username });
+
+    io.emit('onlineUsers', Array.from(onlineUsers.entries()).map(([userId, { username }]) => ({ userId, username })));
 
     console.log('A user connected:', socket.id, 'User ID:', userId);
 
     socket.on('disconnect', () => {
         onlineUsers.delete(userId);
-        io.emit('onlineUsers', Array.from(onlineUsers.keys()));
+        io.emit('onlineUsers', Array.from(onlineUsers.entries()).map(([userId, { username }]) => ({ userId, username })));
         console.log('User disconnected:', socket.id);
-    });
-
-    socket.on('joinRoom', ({ roomName }) => {
-        socket.join(roomName);
-        console.log(`User ${socket.id} joined room: ${roomName}`);
     });
 
     socket.on('sendMessage', (msg, callback) => {
         const { toUserId, text } = msg;
-        const recipientSocketId = onlineUsers.get(toUserId);
+        const recipientSocketInfo = onlineUsers.get(toUserId);
 
-        if (recipientSocketId) {
-            io.to(recipientSocketId).emit('receiveMessage', msg);
+        if (recipientSocketInfo) {
+            io.to(recipientSocketInfo.socketId).emit('receiveMessage', msg);
             console.log(`Message sent to user ${toUserId}: ${text}`);
         } else {
             console.log(`User ${toUserId} is not online.`);
         }
 
-        callback({ status: 'ok' }); // Send acknowledgment back to the client
+        callback({ status: 'ok' });
     });
 });
 

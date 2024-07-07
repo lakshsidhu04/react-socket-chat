@@ -23,7 +23,9 @@ const ChatWindow = ({ targetUser }) => {
     }, [socket]);
 
     const handleSendMessage = () => {
-        if (newMessage.trim() === '') return;
+        if (newMessage.trim() === '' || user._id === targetUser._id) {
+            return;
+        }
 
         const msg = {
             fromUserId: user._id,

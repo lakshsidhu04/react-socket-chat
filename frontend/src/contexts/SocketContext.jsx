@@ -15,16 +15,16 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
 
-    const connectSocket = (userId) => {
+    const connectSocket = (user) => {
         if (!socket) {
             const newSocket = io('http://localhost:3030', {
-                query: { userId }
+                query: { user: JSON.stringify(user) }
             });
 
             newSocket.on('connect', () => {
                 console.log('New socket connected with id:', newSocket.id);
                 setSocket(newSocket);
-                console.log('User', userId, 'connected with socket id', newSocket.id);
+                console.log('User', user._id, 'connected with socket id', newSocket.id);
             });
 
             newSocket.on('onlineUsers', (users) => {

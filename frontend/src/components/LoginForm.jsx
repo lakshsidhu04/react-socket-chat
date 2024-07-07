@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useSocket } from '../contexts/SocketContext';
-
+import { Link } from 'react-router-dom';
 const LoginForm = () => {
     const { setUser, user } = useUser();
     const [username, setUsername] = useState('');
@@ -12,11 +12,11 @@ const LoginForm = () => {
 
     useEffect(() => {
         if (user) {
-            connectSocket(user._id);
+            connectSocket(user);
             navigate('/chat');
         }
     }, [user, connectSocket, navigate]);
-
+    
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
@@ -67,6 +67,12 @@ const LoginForm = () => {
                         Login
                     </button>
                 </form>
+
+                <div className="text-center mt-4">
+                    <Link to="/signup" className="text-indigo-600 hover:text-indigo-700">
+                        Don't have an account? Sign up
+                    </Link>
+                </div>
             </div>
         </div>
     );
