@@ -8,16 +8,15 @@ const LoginForm = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
-    const { connectSocket, socket } = useSocket();
+    const { connectSocket } = useSocket();
 
     useEffect(() => {
         if (user) {
-            const userSocket = connectSocket(user._id);
-            console.log('Connected the user with socket:', userSocket);
+            connectSocket(user._id);
             navigate('/chat');
         }
     }, [user, connectSocket, navigate]);
-    
+
     const handleLogin = async (e) => {
         e.preventDefault();
         try {

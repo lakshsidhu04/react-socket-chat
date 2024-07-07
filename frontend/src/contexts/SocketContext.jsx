@@ -13,7 +13,7 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
-    const [onlineUsers, setOnlineUsers] = useState([]); 
+    const [onlineUsers, setOnlineUsers] = useState([]);
 
     const connectSocket = (userId) => {
         if (!socket) {
@@ -24,13 +24,14 @@ export const SocketProvider = ({ children }) => {
             newSocket.on('connect', () => {
                 console.log('New socket connected with id:', newSocket.id);
                 setSocket(newSocket);
-                console.log('User', userId, 'connected with socketid', newSocket.id);
+                console.log('User', userId, 'connected with socket id', newSocket.id);
             });
-            
+
             newSocket.on('onlineUsers', (users) => {
                 console.log('Online users:', users);
                 setOnlineUsers(users);
-            })
+            });
+
             return newSocket;
         }
     };
@@ -41,7 +42,7 @@ export const SocketProvider = ({ children }) => {
             setSocket(null);
         }
     };
-    
+
     useEffect(() => {
         return () => {
             if (socket) {
@@ -51,7 +52,7 @@ export const SocketProvider = ({ children }) => {
     }, [socket]);
 
     return (
-        <SocketContext.Provider value={{ socket, connectSocket, disconnectSocket }}>
+        <SocketContext.Provider value={{ socket, connectSocket, disconnectSocket, onlineUsers }}>
             {children}
         </SocketContext.Provider>
     );

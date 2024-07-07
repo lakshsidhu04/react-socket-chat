@@ -1,78 +1,69 @@
 import React, { useEffect, useState } from 'react';
-import { initSocket } from '../services/ChatService';
+import { useSocket } from '../contexts/SocketContext';
 import { useUser } from '../contexts/UserContext';
 
 const ChatWindow = ({ targetUser }) => {
+    const { socket } = useSocket();
     const { user } = useUser();
     const [messages, setMessages] = useState([]);
-    const [message, setMessage] = useState('');
-    const [socket, setSocket] = useState(null);
-    
-    useEffect(() => {
-        const socketInstance = initSocket();
-        setSocket(socketInstance);
+    const [newMessage, setNewMessage] = useState('');
 
-        socketInstance.on('message', (msg) => {
-            setMessages((prevMessages) => [...prevMessages, msg]);
-        });
+    useEffect(() => {
+        if (socket) {
+            socket.on('receiveMessage', (msg) => {
+                setMessages((prevMessages) => [...prevMessages, msg]);
+            });
+        }
 
         return () => {
-            socketInstance.disconnect();
+            if (socket) {
+                socket.off('receiveMessage');
+            }
         };
-    }, []);
-
-    useEffect(() => {
-        if (user && targetUser && socket) {
-            const roomName = [user._id, targetUser._id].sort().join('_');
-            socket.emit('joinRoom', { roomName });
-        }
-    }, [user, targetUser, socket]);
+    }, [socket]);
 
     const handleSendMessage = () => {
-        if (message.trim() !== '' && user && targetUser && socket) {
-            const roomName = [user._id, targetUser._id].sort().join('_');
-            const msg = {
-                from: user.name,
-                text: message,
-                room: roomName,
-            };
-            socket.emit('sendMessage', msg);
-            setMessages((prevMessages) => [...prevMessages, msg]);
-            setMessage('');
-        }
+        if (newMessage.trim() === '') return;
+
+        const msg = {
+            fromUserId: user._id,
+            toUserId: targetUser._id,
+            text: newMessage,
+        };
+        socket.emit('sendMessage', msg, (response) => {
+            if (response.status === 'ok') {
+                setMessages((prevMessages) => [...prevMessages, msg]);
+                setNewMessage('');
+            }
+        });
     };
 
     return (
-        <div className="flex flex-col p-4 bg-white h-full">
-            {targetUser ? (
-                <>
-                    <h2 className="text-2xl font-bold mb-4">Chat with {targetUser.name}</h2>
-                    <div className="flex-grow overflow-y-auto">
-                        {messages.map((msg, index) => (
-                            <div key={index} className="mb-4">
-                                <div className="font-bold">{msg.from}</div>
-                                <div>{msg.text}</div>
-                            </div>
-                        ))}
+        <div className="flex flex-col h-full p-4">
+            <div className="flex-grow overflow-y-auto bg-gray-200 p-4 rounded mb-4">
+                {messages.map((msg, index) => (
+                    <div
+                        key={index}
+                        className={`p-2 mb-2 rounded ${msg.fromUserId === user._id ? 'bg-blue-500 text-white self-end' : 'bg-gray-300 text-black self-start'}`}
+                    >
+                        {msg.text}
                     </div>
-                    <div className="mt-4">
-                        <input
-                            type="text"
-                            className="border p-2 w-full"
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            placeholder="Type a message..."
-                        />
-                        <button className="bg-blue-500 text-white p-2 mt-2 w-full" onClick={handleSendMessage}>
-                            Send
-                        </button>
-                    </div>
-                </>
-            ) : (
-                <div className="flex justify-center items-center h-full">
-                    <p>Select a user to start chatting</p>
-                </div>
-            )}
+                ))}
+            </div>
+            <div className="flex">
+                <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    className="flex-grow p-2 border border-gray-300 rounded mr-2"
+                />
+                <button
+                    onClick={handleSendMessage}
+                    className="p-2 bg-blue-500 text-white rounded"
+                >
+                    Send
+                </button>
+            </div>
         </div>
     );
 };

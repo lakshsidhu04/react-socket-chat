@@ -1,20 +1,16 @@
-import React, { useEffect, useState } from 'react';
+// components/Container.jsx
+
+import React, { useState } from 'react';
 import SideBar from './SideBar';
-import ChatWindow from './ChatWindow';
-import { useUser } from '../contexts/UserContext';
+import Chat from './Chat';
 
 const Container = () => {
-  const { currentUser } = useUser();
   const [targetUser, setTargetUser] = useState(null);
-
-  useEffect(() => {
-    console.log('Current User at container:', currentUser);
-  }, [currentUser]);
 
   return (
     <div className="flex h-screen">
       <SideBar setTargetUser={setTargetUser} />
-      {currentUser && targetUser && <ChatWindow targetUser={targetUser} />}
+      {targetUser && <Chat targetUser={targetUser} />}
     </div>
   );
 };
