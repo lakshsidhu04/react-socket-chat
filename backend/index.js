@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -52,7 +53,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('sendMessage', (msg, callback) => {
-        const { toUserId, text } = msg;
+        const { toUserId, text, fromUserId, fromUsername } = msg;
         const recipientSocketInfo = onlineUsers.get(toUserId);
 
         if (recipientSocketInfo) {

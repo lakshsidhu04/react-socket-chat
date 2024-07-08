@@ -1,3 +1,4 @@
+// Container.jsx
 import React, { useState } from 'react';
 import SideBar from './SideBar';
 import ChatWindow from './ChatWindow';
@@ -6,12 +7,12 @@ const Container = () => {
   const [targetUser, setTargetUser] = useState(null);
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="w-screen max-w-screen-xl min-h-96 max-h-screen h-screen bg-gray-800 text-white shadow-lg rounded-lg overflow-hidden flex">
-        <div className="w-1/4 bg-gray-800 text-white">
+    <div className="flex justify-center items-center min-h-screen w-screen bg-gray-100">
+      <div className="h-screen bg-white shadow-xl w-screen rounded-lg overflow-hidden flex">
+        <div className="w-1/5 bg-gray-800 text-white">
           <SideBar setTargetUser={setTargetUser} />
         </div>
-        <div className="w-3/4 bg-white">
+        <div className="w-4/5 flex flex-col ">
           {targetUser ? (
             <ChatWindow targetUser={targetUser} />
           ) : (

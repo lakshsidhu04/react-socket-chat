@@ -7,6 +7,9 @@ export default {
   theme: {
     extend: {},
   },
+  safelist: [
+    'bg-[url(\'/src/assets/chat-bg.jpg\')]',
+  ],
   plugins: [],
 }
 

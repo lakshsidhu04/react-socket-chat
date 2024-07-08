@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSocket } from '../contexts/SocketContext';
 import { useUser } from '../contexts/UserContext';
+import { AiOutlineSend } from 'react-icons/ai';
 
 const ChatWindow = ({ targetUser }) => {
     const { socket } = useSocket();
@@ -21,11 +22,11 @@ const ChatWindow = ({ targetUser }) => {
             }
         };
     }, [socket]);
-    
+
     useEffect(() => {
-        setMessages([]); // Reset messages when targetUser changes
+        setMessages([]);
     }, [targetUser]);
-    
+
     const handleSendMessage = () => {
         if (newMessage.trim() === '' || user._id === targetUser._id) {
             return;
@@ -35,6 +36,7 @@ const ChatWindow = ({ targetUser }) => {
             fromUserId: user._id,
             toUserId: targetUser._id,
             text: newMessage,
+            fromUsername: user.username,
         };
         socket.emit('sendMessage', msg, (response) => {
             if (response.status === 'ok') {
@@ -45,17 +47,33 @@ const ChatWindow = ({ targetUser }) => {
     };
 
     return (
-        <div className="flex flex-col h-full p-4">
-            <div className="flex-grow overflow-y-auto bg-gray-100 p-4 rounded mb-4">
+        <div className="chat-window-container flex flex-col h-full p-4 bg-gradient-to-br from-purple-600 to-indigo-600 text-white">
+            <div className="text-xl font-bold mb-4 text-center">
+                <div className="inline-block py-1 px-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white">
+                    {targetUser.username}
+                </div>
+            </div>
+
+            <div className="flex-grow overflow-y-auto">
                 {messages.map((msg, index) => (
                     <div
                         key={index}
-                        className={`p-2 mb-2 rounded ${msg.fromUserId === user._id ? 'bg-blue-500 text-white self-end' : 'bg-gray-300 text-black self-start'}`}
+                        className={`flex mb-4 ${msg.fromUserId === user._id ? 'justify-end' : 'justify-start'
+                            }`}
                     >
-                        {msg.text}
+                        <div
+                            className={`max-w-xs rounded-lg p-3 ${msg.fromUserId === user._id
+                                    ? 'bg-blue-500 text-white self-end'
+                                    : 'bg-gray-300 text-black self-start'
+                                }`}
+                        >
+                            <strong>{msg.fromUsername}</strong>
+                            <p>{msg.text}</p>
+                        </div>
                     </div>
                 ))}
             </div>
+
             <div className="flex">
                 <input
                     type="text"
@@ -67,7 +85,7 @@ const ChatWindow = ({ targetUser }) => {
                     onClick={handleSendMessage}
                     className="p-2 bg-blue-500 text-white rounded"
                 >
-                    Send
+                    <AiOutlineSend />
                 </button>
             </div>
         </div>

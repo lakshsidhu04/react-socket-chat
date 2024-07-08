@@ -13,27 +13,35 @@ const SideBar = ({ setTargetUser }) => {
     const handleUserClick = (clickedUser) => {
         if (user._id === clickedUser._id) {
             console.log('Cannot chat with yourself');
+            alert('Cannot chat with yourself');
             return;
         }
         setTargetUser(clickedUser);
     };
 
     return (
-        <div className="h-full p-4">
-            <h1 className="text-2xl font-bold mb-4">Online Users</h1>
+        <div className="h-full p-4 bg-gradient-to-b from-purple-600 to-indigo-600 text-white">
+            <h1 className="text-2xl font-bold mb-4 text-center">Online Users</h1>
             <ul>
-                {onlineUsers.length > 0 ? (
-                    onlineUsers.map((userInfo) => (
-                        <li
-                            key={userInfo.userId}
-                            onClick={() => handleUserClick({ _id: userInfo.userId, username: userInfo.username })}
-                            className="cursor-pointer p-2 hover:bg-gray-600 rounded"
-                        >
-                            {userInfo.username}
-                        </li>
-                    ))
+                {onlineUsers.length > 1 ? (
+                    onlineUsers
+                        .filter((userInfo) => userInfo.userId !== user._id) // Filter out the current user
+                        .map((userInfo) => (
+                            <li
+                                key={userInfo.userId}
+                                onClick={() =>
+                                    handleUserClick({
+                                        _id: userInfo.userId,
+                                        username: userInfo.username,
+                                    })
+                                }
+                                className="cursor-pointer p-2 hover:bg-indigo-700 rounded text-white"
+                            >
+                                {userInfo.username}
+                            </li>
+                        ))
                 ) : (
-                    <li>No users online</li>
+                    <li className="text-white">No other users online</li>
                 )}
             </ul>
         </div>
