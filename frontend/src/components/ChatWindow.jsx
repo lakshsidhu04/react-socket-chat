@@ -21,7 +21,11 @@ const ChatWindow = ({ targetUser }) => {
             }
         };
     }, [socket]);
-
+    
+    useEffect(() => {
+        setMessages([]); // Reset messages when targetUser changes
+    }, [targetUser]);
+    
     const handleSendMessage = () => {
         if (newMessage.trim() === '' || user._id === targetUser._id) {
             return;
@@ -42,7 +46,7 @@ const ChatWindow = ({ targetUser }) => {
 
     return (
         <div className="flex flex-col h-full p-4">
-            <div className="flex-grow overflow-y-auto bg-gray-200 p-4 rounded mb-4">
+            <div className="flex-grow overflow-y-auto bg-gray-100 p-4 rounded mb-4">
                 {messages.map((msg, index) => (
                     <div
                         key={index}
@@ -57,7 +61,7 @@ const ChatWindow = ({ targetUser }) => {
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    className="flex-grow p-2 border border-gray-300 rounded mr-2"
+                    className="flex-grow p-2 border border-gray-300 rounded mr-2 text-black"
                 />
                 <button
                     onClick={handleSendMessage}

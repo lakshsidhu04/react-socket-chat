@@ -1,8 +1,11 @@
+// LoginForm.jsx
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useSocket } from '../contexts/SocketContext';
 import { Link } from 'react-router-dom';
+
 const LoginForm = () => {
     const { setUser, user } = useUser();
     const [username, setUsername] = useState('');
@@ -16,7 +19,7 @@ const LoginForm = () => {
             navigate('/chat');
         }
     }, [user, connectSocket, navigate]);
-    
+
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
@@ -33,14 +36,13 @@ const LoginForm = () => {
             }
             const data = await response.json();
             setUser(data.user);
-
         } catch (error) {
             console.error('Login error:', error);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen flex w-screen items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8">
                 <div>
                     <h2 className="text-center text-3xl font-extrabold text-gray-900">Log in to your account</h2>

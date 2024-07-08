@@ -19,14 +19,14 @@ const SideBar = ({ setTargetUser }) => {
     };
 
     return (
-        <div className="bg-gray-800 text-white h-full p-4">
+        <div className="h-full p-4">
             <h1 className="text-2xl font-bold mb-4">Online Users</h1>
             <ul>
                 {onlineUsers.length > 0 ? (
                     onlineUsers.map((userInfo) => (
                         <li
-                            key={userInfo.userId} // Changed key to userId
-                            onClick={() => handleUserClick({ _id: userInfo.userId, username: userInfo.username })} // Changed socketId to userId
+                            key={userInfo.userId}
+                            onClick={() => handleUserClick({ _id: userInfo.userId, username: userInfo.username })}
                             className="cursor-pointer p-2 hover:bg-gray-600 rounded"
                         >
                             {userInfo.username}
