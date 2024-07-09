@@ -55,7 +55,7 @@ io.on('connection', (socket) => {
     socket.on('sendMessage', (msg, callback) => {
         const { toUserId, text, fromUserId, fromUsername } = msg;
         const recipientSocketInfo = onlineUsers.get(toUserId);
-
+        
         if (recipientSocketInfo) {
             io.to(recipientSocketInfo.socketId).emit('receiveMessage', msg);
             console.log(`Message sent to user ${toUserId}: ${text}`);

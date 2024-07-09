@@ -6,13 +6,13 @@ import { AiOutlineSend } from 'react-icons/ai';
 const ChatWindow = ({ targetUser }) => {
     const { socket } = useSocket();
     const { user } = useUser();
-    const [messages, setMessages] = useState([]);
+    const [allMessages, setAllMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
 
     useEffect(() => {
         if (socket) {
             socket.on('receiveMessage', (msg) => {
-                setMessages((prevMessages) => [...prevMessages, msg]);
+                setAllMessages((prevMessages) => [...prevMessages, msg]);
             });
         }
 
@@ -22,10 +22,6 @@ const ChatWindow = ({ targetUser }) => {
             }
         };
     }, [socket]);
-
-    useEffect(() => {
-        setMessages([]);
-    }, [targetUser]);
 
     const handleSendMessage = () => {
         if (newMessage.trim() === '' || user._id === targetUser._id) {
@@ -40,11 +36,16 @@ const ChatWindow = ({ targetUser }) => {
         };
         socket.emit('sendMessage', msg, (response) => {
             if (response.status === 'ok') {
-                setMessages((prevMessages) => [...prevMessages, msg]);
+                setAllMessages((prevMessages) => [...prevMessages, msg]);
                 setNewMessage('');
             }
         });
     };
+
+    const filteredMessages = allMessages.filter(
+        (msg) => (msg.fromUserId === user._id && msg.toUserId === targetUser._id) ||
+            (msg.fromUserId === targetUser._id && msg.toUserId === user._id)
+    );
 
     return (
         <div className="chat-window-container flex flex-col h-full p-4 bg-gradient-to-br from-purple-600 to-indigo-600 text-white">
@@ -55,16 +56,15 @@ const ChatWindow = ({ targetUser }) => {
             </div>
 
             <div className="flex-grow overflow-y-auto">
-                {messages.map((msg, index) => (
+                {filteredMessages.map((msg, index) => (
                     <div
                         key={index}
-                        className={`flex mb-4 ${msg.fromUserId === user._id ? 'justify-end' : 'justify-start'
-                            }`}
+                        className={`flex mb-4 ${msg.fromUserId === user._id ? 'justify-end' : 'justify-start'}`}
                     >
                         <div
                             className={`max-w-xs rounded-lg p-3 ${msg.fromUserId === user._id
-                                    ? 'bg-blue-500 text-white self-end'
-                                    : 'bg-gray-300 text-black self-start'
+                                ? 'bg-blue-500 text-white self-end'
+                                : 'bg-gray-300 text-black self-start'
                                 }`}
                         >
                             <strong>{msg.fromUsername}</strong>
