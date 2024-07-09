@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AiOutlineSend } from 'react-icons/ai';
-
+import { MdEmojiEmotions } from "react-icons/md";
+import { MdOutlineEmojiEmotions } from "react-icons/md";
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 
@@ -24,9 +25,9 @@ const SendMessage = ({ onSendMessage }) => {
         <div className="send-message-container flex items-center">
             <button
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="emoji-button p-2 bg-blue-500 text-white rounded mr-2"
+                className="emoji-button p-2 bg-[#00111A] border-white border-2 text-white rounded-md mr-2 text-2xl"
             >
-                😊
+                <MdOutlineEmojiEmotions />
             </button>
             {showEmojiPicker && (
                 <div className="emoji-picker">
@@ -41,7 +42,7 @@ const SendMessage = ({ onSendMessage }) => {
             />
             <button
                 onClick={handleSendMessage}
-                className="p-2 bg-blue-500 text-white rounded"
+                className="p-3 bg-blue-500 text-white rounded"
             >
                 <AiOutlineSend />
             </button>

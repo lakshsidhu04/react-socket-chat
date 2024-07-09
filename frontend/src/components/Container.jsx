@@ -8,7 +8,7 @@ const Container = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen w-screen bg-gray-100">
-      <div className="h-screen bg-white shadow-xl w-screen rounded-lg overflow-hidden flex">
+      <div className="h-screen bg-white shadow-xl w-screen  overflow-hidden flex">
         <div className="w-1/5 bg-gray-800 text-white">
           <SideBar setTargetUser={setTargetUser} />
         </div>

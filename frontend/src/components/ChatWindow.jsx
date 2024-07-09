@@ -32,10 +32,10 @@ const ChatWindow = ({ targetUser }) => {
     );
 
     return (
-        <div className="chat-window-container flex flex-col h-full p-4 bg-gradient-to-br from-purple-600 to-indigo-600 text-white">
+        <div className="chat-window-container flex flex-col h-full p-4 bg-[#001824] text-white">
             <div className="text-xl font-bold mb-4 text-center">
-                <div className="flex items-center justify-center h-16 py-1 px-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white">
-                    <FaRegUser className="mr-2" />
+                <div className="flex items-center justify-start m-2 h-16 py-1 px-2 rounded-lg bg-[#00293D] text-white">
+                    <FaRegUser className="mr-8 ml-2" />
                     {targetUser.username}
                 </div>
             </div>
@@ -48,8 +48,8 @@ const ChatWindow = ({ targetUser }) => {
                     >
                         <div
                             className={`max-w-xs p-3  ${msg.fromUserId === user._id
-                                ? 'bg-blue-500 text-white self-end rounded-br-xl rounded-tl-xl rounded-bl-xl'
-                                : 'bg-gray-100 text-black self-start rounded-bl-xl rounded-tr-xl rounded-br-xl'
+                                ? 'bg-gradient-to-tr from-cyan-600 to-violet-800 text-white self-end rounded-br-xl rounded-tl-xl rounded-bl-xl'
+                                : 'bg-gradient-to-br from-red-800 to-pink-400 text-white self-start rounded-bl-xl rounded-tr-xl rounded-br-xl'
                                 }`}
                         >
                             <strong>{msg.fromUsername}</strong>
