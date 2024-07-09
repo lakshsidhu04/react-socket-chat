@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useUser } from '../contexts/UserContext';
 import { useSocket } from '../contexts/SocketContext';
+import { FaRegUser } from "react-icons/fa6";
 
 const SideBar = ({ setTargetUser }) => {
     const { user } = useUser();
@@ -37,6 +38,7 @@ const SideBar = ({ setTargetUser }) => {
                                 }
                                 className="cursor-pointer p-2 hover:bg-indigo-700 rounded text-white"
                             >
+                                <FaRegUser className="inline-block mr-2" />
                                 {userInfo.username}
                             </li>
                         ))
