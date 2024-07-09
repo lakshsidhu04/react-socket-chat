@@ -4,24 +4,9 @@ import { useUser } from '../contexts/UserContext';
 import { AiOutlineSend } from 'react-icons/ai';
 
 const ChatWindow = ({ targetUser }) => {
-    const { socket } = useSocket();
+    const { socket, allMessages, setAllMessages } = useSocket();
     const { user } = useUser();
-    const [allMessages, setAllMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
-
-    useEffect(() => {
-        if (socket) {
-            socket.on('receiveMessage', (msg) => {
-                setAllMessages((prevMessages) => [...prevMessages, msg]);
-            });
-        }
-
-        return () => {
-            if (socket) {
-                socket.off('receiveMessage');
-            }
-        };
-    }, [socket]);
 
     const handleSendMessage = () => {
         if (newMessage.trim() === '' || user._id === targetUser._id) {

@@ -15,12 +15,13 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [allMessages, setAllMessages] = useState([]);
+
     const connectSocket = (user) => {
         if (!socket) {
             const newSocket = io('http://localhost:3030', {
                 query: { user: JSON.stringify(user) }
             });
-            
+
             newSocket.on('connect', () => {
                 console.log('New socket connected with id:', newSocket.id);
                 setSocket(newSocket);
@@ -31,7 +32,11 @@ export const SocketProvider = ({ children }) => {
                 console.log('Online users:', users);
                 setOnlineUsers(users);
             });
-            
+
+            newSocket.on('receiveMessage', (msg) => {
+                setAllMessages((prevMessages) => [...prevMessages, msg]);
+            });
+
             return newSocket;
         }
     };
@@ -52,7 +57,7 @@ export const SocketProvider = ({ children }) => {
     }, [socket]);
 
     return (
-        <SocketContext.Provider value={{ socket, connectSocket, disconnectSocket, allMessages,setAllMessages,onlineUsers }}>
+        <SocketContext.Provider value={{ socket, connectSocket, disconnectSocket, allMessages, setAllMessages, onlineUsers }}>
             {children}
         </SocketContext.Provider>
     );
