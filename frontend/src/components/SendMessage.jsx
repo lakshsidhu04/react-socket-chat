@@ -38,7 +38,7 @@ const SendMessage = ({ onSendMessage }) => {
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                className="flex-grow p-2 border border-gray-300 rounded mr-2 text-black"
+                className="flex-grow p-2 border border-gray-300 rounded mr-2 text-black outline-none focus:border-blue-500"
             />
             <button
                 onClick={handleSendMessage}

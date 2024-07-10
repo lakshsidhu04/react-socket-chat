@@ -4,6 +4,7 @@ import LoginForm from './components/LoginForm';
 import Container from './components/Container';
 import { SocketProvider } from './contexts/SocketContext';
 import { UserProvider } from './contexts/UserContext';
+import Profile from './components/Profile';
 import SignUpForm from './components/SignUpForm';
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<LoginForm />} />
             <Route path="/chat" element={<Container />} />
+            <Route path='/profile' element={<Profile />} />
             <Route path="/signup" element={<SignUpForm />} />
           </Routes>
         </Router>

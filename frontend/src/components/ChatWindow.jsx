@@ -39,20 +39,20 @@ const ChatWindow = ({ targetUser }) => {
                     {targetUser.username}
                 </div>
             </div>
-
-            <div className="flex-grow overflow-y-auto">
+            
+            <div className="flex-grow overflow-hidden">
                 {filteredMessages.map((msg, index) => (
                     <div
                         key={index}
-                        className={`flex mb-4 ${msg.fromUserId === user._id ? 'justify-end' : 'justify-start'}`}
+                        className={`flex mb-4 overflow-hidden ${msg.fromUserId === user._id ? 'justify-end' : 'justify-start'}`}
                     >
                         <div
-                            className={`max-w-xs p-3  ${msg.fromUserId === user._id
+                            className={`max-w-lg min-h-5 p-3  ${msg.fromUserId === user._id
                                 ? 'bg-gradient-to-tr from-cyan-600 to-violet-800 text-white self-end rounded-br-xl rounded-tl-xl rounded-bl-xl'
                                 : 'bg-gradient-to-br from-red-800 to-pink-400 text-white self-start rounded-bl-xl rounded-tr-xl rounded-br-xl'
                                 }`}
                         >
-                            <strong>{msg.fromUsername}</strong>
+                            <strong>{msg.fromUsername === user.username ? 'you' : msg.fromUsername}</strong>
                             <p>{msg.text}</p>
                         </div>
                     </div>

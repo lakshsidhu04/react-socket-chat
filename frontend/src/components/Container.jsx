@@ -16,8 +16,8 @@ const Container = () => {
           {targetUser ? (
             <ChatWindow targetUser={targetUser} />
           ) : (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500">Select a user to start chatting</p>
+              <div className="flex items-center justify-center h-full bg-[#00293D]">
+              <p className="text-gray-300  text-xl">Select a user to start chatting</p>
             </div>
           )}
         </div>
