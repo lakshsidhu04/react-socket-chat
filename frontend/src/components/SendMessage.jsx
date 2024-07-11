@@ -17,6 +17,12 @@ const SendMessage = ({ onSendMessage }) => {
         }
     };
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            handleSendMessage();
+        }
+    };
+
     const addEmoji = (emoji) => {
         setNewMessage(newMessage + emoji.native);
     };
@@ -38,6 +44,7 @@ const SendMessage = ({ onSendMessage }) => {
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="flex-grow p-2 border border-gray-300 rounded mr-2 text-black outline-none focus:border-blue-500"
             />
             <button
