@@ -7,7 +7,7 @@ const generateAuthToken = (user, res) => {
             expiresIn: process.env.JWT_EXPIRES_IN,
         });
         console.log('Generated Token:', token);
-
+        
         res.cookie('jwt', token, {
             maxAge: parseInt(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000,
             httpOnly: true,

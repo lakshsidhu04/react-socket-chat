@@ -1,5 +1,3 @@
-// SignUpForm.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
@@ -11,6 +9,7 @@ const SignUpForm = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [gender, setGender] = useState('Male');
     const [error, setError] = useState('');
     const { setUser, user } = useUser();
     const navigate = useNavigate();
@@ -42,7 +41,7 @@ const SignUpForm = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, username, password, confirmPassword }),
+                body: JSON.stringify({ name, username, password, confirmPassword, gender }),
             });
 
             if (!response.ok) {
@@ -94,6 +93,45 @@ const SignUpForm = () => {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                     />
+                    <div className="flex items-center">
+                        <label className="mr-4">Gender:</label>
+                        <div className="mr-4">
+                            <input
+                                type="radio"
+                                id="male"
+                                name="gender"
+                                value="Male"
+                                checked={gender === 'Male'}
+                                onChange={(e) => setGender(e.target.value)}
+                                className="mr-1"
+                            />
+                            <label htmlFor="male">Male</label>
+                        </div>
+                        <div className="mr-4">
+                            <input
+                                type="radio"
+                                id="female"
+                                name="gender"
+                                value="Female"
+                                checked={gender === 'Female'}
+                                onChange={(e) => setGender(e.target.value)}
+                                className="mr-1"
+                            />
+                            <label htmlFor="female">Female</label>
+                        </div>
+                        <div>
+                            <input
+                                type="radio"
+                                id="other"
+                                name="gender"
+                                value="Other"
+                                checked={gender === 'Other'}
+                                onChange={(e) => setGender(e.target.value)}
+                                className="mr-1"
+                            />
+                            <label htmlFor="other">Other</label>
+                        </div>
+                    </div>
                     <div>
                         <button
                             type="submit"

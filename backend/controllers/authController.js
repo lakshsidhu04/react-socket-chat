@@ -4,7 +4,7 @@ const User = require('../models/userModel');
 
 exports.signup = async (req, res) => {
     try {
-        const { name, username, password, confirmPassword } = req.body;
+        const { name, username, password, confirmPassword, gender } = req.body;
         console.log(req.body);
         if (password !== confirmPassword) {
             return res.status(400).json({ status: 'fail', message: 'Passwords do not match' });
@@ -14,7 +14,7 @@ exports.signup = async (req, res) => {
             return res.status(400).json({ status: 'fail', message: 'Username taken' });
         }
         const hashedPassword = await bcrypt.hash(password, 12);
-        const newUser = await User.create({ name, username, password: hashedPassword });
+        const newUser = await User.create({ name, username, password: hashedPassword , gender });
         console.log('created user');
         if (newUser) {
             generateAuthToken(newUser, res);
@@ -30,7 +30,6 @@ exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
         
-        // Log the received request body
         console.log('Request Body:', req.body);
 
         if (!username || !password) {

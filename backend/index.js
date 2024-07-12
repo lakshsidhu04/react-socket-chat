@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -40,15 +39,16 @@ io.on('connection', (socket) => {
     const user = JSON.parse(socket.handshake.query.user);
     const userId = user._id;
     const username = user.username;
-    onlineUsers.set(userId, { socketId: socket.id, username });
-
-    io.emit('onlineUsers', Array.from(onlineUsers.entries()).map(([userId, { username }]) => ({ userId, username })));
+    const gender = user.gender;
+    onlineUsers.set(userId, { socketId: socket.id, username, gender });
+    
+    io.emit('onlineUsers', Array.from(onlineUsers.entries()).map(([userId, { username ,gender}] ) => ({ userId, username ,gender})));
 
     console.log('A user connected:', socket.id, 'User ID:', userId);
 
     socket.on('disconnect', () => {
         onlineUsers.delete(userId);
-        io.emit('onlineUsers', Array.from(onlineUsers.entries()).map(([userId, { username }]) => ({ userId, username })));
+        io.emit('onlineUsers', Array.from(onlineUsers.entries()).map(([userId, { username ,gender}]) => ({ userId, username ,gender})));
         console.log('User disconnected:', socket.id);
     });
 
