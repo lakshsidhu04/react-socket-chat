@@ -6,6 +6,7 @@ import { SocketProvider } from './contexts/SocketContext';
 import { UserProvider } from './contexts/UserContext';
 import Profile from './components/Profile';
 import SignUpForm from './components/SignUpForm';
+import PendingFriendRequests from './components/PendingFriendRequests';
 const App = () => {
   return (
     <UserProvider>
@@ -16,6 +17,7 @@ const App = () => {
             <Route path="/chat" element={<Container />} />
             <Route path='/profile' element={<Profile />} />
             <Route path="/signup" element={<SignUpForm />} />
+            <Route path="/requests" element={<PendingFriendRequests />} />
           </Routes>
         </Router>
       </SocketProvider>
