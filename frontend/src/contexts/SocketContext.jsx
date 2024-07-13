@@ -27,16 +27,16 @@ export const SocketProvider = ({ children }) => {
                 setSocket(newSocket);
                 console.log('User', user._id, 'connected with socket id', newSocket.id);
             });
-
+            
             newSocket.on('onlineUsers', (users) => {
                 console.log('Online users:', users);
                 setOnlineUsers(users);
             });
-
+            
             newSocket.on('receiveMessage', (msg) => {
                 setAllMessages((prevMessages) => [...prevMessages, msg]);
             });
-
+            
             return newSocket;
         }
     };

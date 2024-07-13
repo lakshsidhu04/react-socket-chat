@@ -6,7 +6,6 @@ import SendMessage from './SendMessage';
 const ChatWindow = ({ targetUser }) => {
     const { socket, allMessages, setAllMessages } = useSocket();
     const { user } = useUser();
-
     const malePic = 'https://www.w3schools.com/w3images/avatar2.png';
     const femalePic = 'https://www.w3schools.com/w3images/avatar4.png';
 
@@ -21,6 +20,7 @@ const ChatWindow = ({ targetUser }) => {
             text: newMessage,
             fromUsername: user.username,
         };
+        console.log('Sending message:', msg)
         socket.emit('sendMessage', msg, (response) => {
             if (response.status === 'ok') {
                 setAllMessages((prevMessages) => [...prevMessages, msg]);
@@ -33,9 +33,15 @@ const ChatWindow = ({ targetUser }) => {
             (msg.fromUserId === targetUser._id && msg.toUserId === user._id)
     );
 
-    const handleLogout = () => {
-        console.log("User logged out");
-    };
+    useEffect(() => {
+        socket.on('receiveMessage', (msg) => {
+            setAllMessages((prevMessages) => [...prevMessages, msg]);
+        });
+
+        return () => {
+            socket.off('receiveMessage');
+        };
+    }, [socket, setAllMessages]);
 
     return (
         <div className="chat-window-container flex flex-col h-full p-4 bg-[#001824] text-white relative">

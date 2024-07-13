@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const malePic = 'https://www.w3schools.com/w3images/avatar2.png'
-const femalePic = 'https://www.w3schools.com/w3images/avatar4.png'
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     username: { type: String, required: true, unique: true },

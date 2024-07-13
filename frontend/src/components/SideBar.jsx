@@ -69,7 +69,7 @@ const SideBar = ({ setTargetUser }) => {
     useEffect(() => {
         console.log('Current online users:', onlineUsers);
     }, [onlineUsers]);
-
+    
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -82,7 +82,7 @@ const SideBar = ({ setTargetUser }) => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [dropdownRef]);
-
+    
     const handleUserClick = (clickedUser) => {
         if (user._id === clickedUser._id) {
             console.log('Cannot chat with yourself');
@@ -90,6 +90,7 @@ const SideBar = ({ setTargetUser }) => {
             return;
         }
         setTargetUser(clickedUser);
+        console.log('Clicked user:', clickedUser);
     };
 
     const handleFriendRequest = async (userId) => {
@@ -197,7 +198,11 @@ const SideBar = ({ setTargetUser }) => {
                         <li
                             key={userInfo.userId}
                             className="relative cursor-pointer flex text-xl m-2 items-center justify-between p-2 hover:bg-[#003D5C] rounded text-white transform hover:scale-105 transition duration-300 ease-in-out"
-                            onClick={() => handleUserClick(userInfo)}
+                            onClick={() => handleUserClick({
+                                _id: userInfo.userId,
+                                username: userInfo.username,
+                                gender: userInfo.gender
+                            })}
                         >
                             <div className="flex items-center">
                                 <img
