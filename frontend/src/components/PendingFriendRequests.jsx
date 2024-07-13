@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 const PendingFriendRequests = () => {
     const { user } = useUser();
     const [requests, setRequests] = useState([]);
-
+    console.log('user:', user);
     useEffect(() => {
         const fetchPendingRequests = async () => {
             try {
@@ -39,7 +39,7 @@ const PendingFriendRequests = () => {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify({ userId })
+                body: JSON.stringify({ sourceId : userId, targetId: user._id})
             });
 
             if (response.ok) {

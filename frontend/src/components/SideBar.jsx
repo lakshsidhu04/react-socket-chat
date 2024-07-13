@@ -3,7 +3,7 @@ import { useUser } from '../contexts/UserContext';
 import { useSocket } from '../contexts/SocketContext';
 import { CiMenuKebab } from "react-icons/ci";
 import { IoIosLogOut } from "react-icons/io";
-import { Link, useNavigate } from 'react-router-dom'; // Import Link from react-router-dom
+import { Link, useNavigate } from 'react-router-dom';
 
 const SideBar = ({ setTargetUser }) => {
     const { user, setUser } = useUser();
@@ -15,6 +15,7 @@ const SideBar = ({ setTargetUser }) => {
     const dropdownRef = useRef(null);
     const [friends, setFriends] = useState([]);
     const [users, setUsers] = useState([]);
+    const [fetchData, setFetchData] = useState(false);
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -39,7 +40,7 @@ const SideBar = ({ setTargetUser }) => {
         };
 
         fetchFriends();
-    }, []);
+    }, [fetchData]);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -51,7 +52,7 @@ const SideBar = ({ setTargetUser }) => {
                     },
                     credentials: 'include'
                 });
-
+                
                 if (response.ok) {
                     const data = await response.json();
                     setUsers(data.users);
@@ -64,12 +65,12 @@ const SideBar = ({ setTargetUser }) => {
         };
 
         fetchUsers();
-    }, []);
+    }, [fetchData]);
 
     useEffect(() => {
         console.log('Current online users:', onlineUsers);
     }, [onlineUsers]);
-    
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -82,7 +83,7 @@ const SideBar = ({ setTargetUser }) => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [dropdownRef]);
-    
+
     const handleUserClick = (clickedUser) => {
         if (user._id === clickedUser._id) {
             console.log('Cannot chat with yourself');
@@ -103,7 +104,7 @@ const SideBar = ({ setTargetUser }) => {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify({ userId })
+                body: JSON.stringify({ targetId : userId, sourceId: user._id})
             });
 
             if (response.ok) {
@@ -113,6 +114,30 @@ const SideBar = ({ setTargetUser }) => {
             }
         } catch (error) {
             console.error('Error sending friend request:', error);
+        }
+    };
+    
+    const handleRemoveFriend = async (userId) => {
+        console.log('Removing friend:', userId);
+        try {
+            const response = await fetch('http://localhost:3030/api/users/remove-friend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ targetId: userId, sourceId: user._id})
+            });
+
+            if (response.ok) {
+                console.log('Friend removed');
+                setFriends(friends.filter(friend => friend._id !== userId));
+                setFetchData(!fetchData);
+            } else {
+                console.error('Failed to remove friend');
+            }
+        } catch (error) {
+            console.error('Error removing friend:', error);
         }
     };
 
@@ -137,9 +162,9 @@ const SideBar = ({ setTargetUser }) => {
             console.error('An error occurred during logout:', error);
         }
     };
-
+    
     const filteredOnlineUsers = onlineUsers.filter(userInfo => userInfo.userId !== user._id && !friends.some(friend => friend._id === userInfo.userId));
-
+    
     return (
         <div className="h-full p-4 bg-[#000e14] text-white">
             <div className="flex items-center justify-between mb-4">
@@ -157,6 +182,14 @@ const SideBar = ({ setTargetUser }) => {
                 >
                     <IoIosLogOut className="w-8 h-8" />
                 </button>
+            </div>
+            <div className="mb-4">
+                <Link
+                    to="/requests"
+                    className="flex items-center justify-center p-2 hover:bg-[#003D5C] rounded text-white transform hover:scale-105 transition duration-300 ease-in-out"
+                >
+                    Pending Friend Requests
+                </Link>
             </div>
             <h1 className="flex flex-col items-center justify-center text-2xl font-bold m-4 text-center">Friends</h1>
             <ul>
@@ -181,8 +214,29 @@ const SideBar = ({ setTargetUser }) => {
                                 )}
                             </div>
                             <div className="relative">
-                                
-                                
+                                <CiMenuKebab
+                                    className="w-6 h-6 p-2 cursor-pointer rounded-full hover:bg-[#001824] transform scale-105 transition duration-300 ease-in-out"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        setShowDropdown(showDropdown === friend._id ? null : friend._id);
+                                    }}
+                                />
+                                {showDropdown === friend._id && (
+                                    <div
+                                        className="absolute right-0 top-8 bg-blue-600 text-black rounded p-2"
+                                        ref={dropdownRef}
+                                    >
+                                        <button
+                                            className="block w-full text-left hover:bg-gray-200 p-1"
+                                            onClick={() => {
+                                                handleRemoveFriend(friend._id);
+                                                setShowDropdown(null);
+                                            }}
+                                        >
+                                            Remove Friend
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </li>
                     ))
