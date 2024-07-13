@@ -98,3 +98,19 @@ exports.getPendingRequests = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
+exports.setProfilePic = async (req, res) => {
+    try {
+        const { profilePic } = req.body;
+        const loggedInUserId = req.user._id;
+
+        const user = await User.findById(loggedInUserId);
+        user.profilePic = profilePic;
+        await user.save();
+
+        res.status(200).json({ status: "Profile picture updated" });
+    } catch (error) {
+        console.error("Error in setProfilePic: ", error.message);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}

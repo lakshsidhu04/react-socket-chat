@@ -236,7 +236,7 @@ const SideBar = ({ setTargetUser }) => {
                         </li>
                     ))
                 ) : (
-                    <li className="text-center">No other online users! They are busy working unlike you 💀</li>
+                    <li className="text-center">No other online users!</li>
                 )}
             </ul>
         </div>
