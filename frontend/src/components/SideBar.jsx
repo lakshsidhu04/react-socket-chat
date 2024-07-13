@@ -180,14 +180,43 @@ const SideBar = ({ setTargetUser }) => {
                                 )}
                             </div>
                             <div className="relative">
+                                
+                                
+                            </div>
+                        </li>
+                    ))
+                ) : (
+                    <li className="text-center">Why so lonely! Find some friends</li>
+                )}
+            </ul>
+
+            <h1 className="flex flex-col items-center justify-center text-2xl font-bold m-4 text-center">Online Users</h1>
+            <ul>
+                {filteredOnlineUsers.length > 0 ? (
+                    filteredOnlineUsers.map((userInfo) => (
+                        <li
+                            key={userInfo.userId}
+                            className="relative cursor-pointer flex text-xl m-2 items-center justify-between p-2 hover:bg-[#003D5C] rounded text-white transform hover:scale-105 transition duration-300 ease-in-out"
+                            onClick={() => handleUserClick(userInfo)}
+                        >
+                            <div className="flex items-center">
+                                <img
+                                    src={userInfo.gender === "Male" ? malePic : femalePic}
+                                    alt="user-profile"
+                                    className="w-8 h-8 rounded-full mr-2"
+                                />
+                                <span>{userInfo.username}</span>
+                                <span className="ml-2 text-green-500">●</span>
+                            </div>
+                            <div className="relative">
                                 <CiMenuKebab
                                     className="w-6 h-6 p-2 cursor-pointer rounded-full hover:bg-[#001824] transform scale-105 transition duration-300 ease-in-out"
                                     onClick={(event) => {
                                         event.stopPropagation();
-                                        setShowDropdown(showDropdown === friend._id ? null : friend._id);
+                                        setShowDropdown(showDropdown === userInfo.userId ? null : userInfo.userId);
                                     }}
                                 />
-                                {showDropdown === friend._id && (
+                                {showDropdown === userInfo.userId && (
                                     <div
                                         className="absolute right-0 top-8 bg-blue-600 text-black rounded p-2"
                                         ref={dropdownRef}
@@ -195,7 +224,7 @@ const SideBar = ({ setTargetUser }) => {
                                         <button
                                             className="block w-full text-left hover:bg-gray-200 p-1"
                                             onClick={() => {
-                                                handleFriendRequest(friend._id);
+                                                handleFriendRequest(userInfo.userId);
                                                 setShowDropdown(null);
                                             }}
                                         >
@@ -207,70 +236,9 @@ const SideBar = ({ setTargetUser }) => {
                         </li>
                     ))
                 ) : (
-                    <li className="text-center">No friends found</li>
+                    <li className="text-center">No other online users! They are busy working unlike you 💀</li>
                 )}
             </ul>
-
-            <h1 className="flex flex-col items-center justify-center text-2xl font-bold m-4 text-center">Online Users</h1>
-            <ul>
-                {filteredOnlineUsers.length > 0 ? (
-                    filteredOnlineUsers.map((onlineUser) => (
-                        <li
-                            key={onlineUser.userId}
-                            className="relative cursor-pointer flex text-xl m-2 items-center justify-between p-2 hover:bg-[#003D5C] rounded text-white transform hover:scale-105 transition duration-300 ease-in-out"
-                            onClick={() => handleUserClick(
-                                {
-                                    _id: onlineUser.userId,
-                                    username: onlineUser.username,
-                                    gender: onlineUser.gender
-                                }
-
-                            )}
-                        >
-                            <div className="flex items-center">
-                                <img
-                                    src={onlineUser.gender === "Male" ? malePic : femalePic}
-                                    alt="user-profile"
-                                    className="w-8 h-8 rounded-full mr-2"
-                                />
-                                <span>{onlineUser.username}</span>
-                                <span className="ml-2 text-green-500">●</span>
-                            </div>
-                            <div className="relative">
-                                <CiMenuKebab
-                                    className="w-6 h-6 cursor-pointer"
-                                    onClick={(event) => {
-                                        event.stopPropagation();
-                                        setShowDropdown(showDropdown === onlineUser.userId ? null : onlineUser.userId);
-                                    }}
-                                />
-                                {showDropdown === onlineUser.userId && (
-                                    <div
-                                        className="absolute right-0 top-8 bg-white text-black rounded p-2"
-                                        ref={dropdownRef}
-                                    >
-                                        <button
-                                            className="block w-full text-left hover:bg-gray-200 p-1"
-                                            onClick={() => {
-                                                handleFriendRequest(onlineUser.userId);
-                                                setShowDropdown(null);
-                                            }}
-                                        >
-                                            Send Friend Request
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </li>
-                    ))
-                ) : (
-                    <li className="text-center">No online users found</li>
-                )}
-            </ul>
-            
-            <Link to="/requests" className="block mt-4 p-2 text-center hover:bg-[#003D5C] rounded text-white transform hover:scale-105 transition duration-300 ease-in-out">
-                Pending Friend Requests
-            </Link>
         </div>
     );
 };

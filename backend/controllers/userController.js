@@ -4,7 +4,7 @@ exports.getUsers = async (req, res) => {
     try {
         const loggedInUserId = req.user._id;
         const users = await User.find().select("-password");
-        res.status(200).json({users:users});
+        res.status(200).json({ users: users });
     } catch (error) {
         console.error("Error in getUsers: ", error.message);
         res.status(500).json({ error: "Internal server error" });
@@ -22,7 +22,7 @@ exports.sendFriendRequest = async (req, res) => {
         if (!user || !recipient) {
             return res.status(404).json({ error: "User not found" });
         }
-
+        
         if (recipient.requests.includes(loggedInUserId)) {
             return res.status(400).json({ error: "Friend request already sent" });
         }
@@ -35,7 +35,7 @@ exports.sendFriendRequest = async (req, res) => {
         console.error("Error in sendFriendRequest: ", error.message);
         res.status(500).json({ error: "Internal server error" });
     }
-}
+};
 
 exports.receiveFriendRequest = async (req, res) => {
     try {
@@ -59,7 +59,7 @@ exports.receiveFriendRequest = async (req, res) => {
 
         await user.save();
         await sender.save();
-
+        
         res.status(200).json({ status: "Friend request accepted" });
     } catch (error) {
         console.error("Error in receiveFriendRequest: ", error.message);
@@ -81,4 +81,20 @@ exports.getFriends = async (req, res) => {
         console.error("Error in getFriends: ", error.message);
         res.status(500).json({ error: "Internal server error" });
     }
-}
+};
+
+exports.getPendingRequests = async (req, res) => {
+    try {
+        const loggedInUserId = req.user._id;
+        const user = await User.findById(loggedInUserId).populate("requests", "-password");
+        
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ requests: user.requests });
+    } catch (error) {
+        console.error("Error in getPendingRequests: ", error.message);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};

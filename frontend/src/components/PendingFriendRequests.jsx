@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useUser } from '../contexts/UserContext';
+import { Link } from 'react-router-dom';
 
 const PendingFriendRequests = () => {
     const { user } = useUser();
@@ -54,6 +55,7 @@ const PendingFriendRequests = () => {
 
     return (
         <div className="p-4 bg-white">
+            <Link to="/chat" className="block text-blue-500 mb-4">Back to Chat</Link>
             <h1 className="text-2xl font-bold mb-4">Pending Friend Requests</h1>
             <ul>
                 {requests.length > 0 ? (
