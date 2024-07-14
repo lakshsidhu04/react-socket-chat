@@ -3,6 +3,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const http = require('http');
+const Message = require('./models/messageModel')
 const { Server } = require('socket.io');
 const AuthRouter = require('./routes/authRoute');
 const UserRouter = require('./routes/UserRoute');
@@ -52,19 +53,84 @@ io.on('connection', (socket) => {
         console.log('User disconnected:', socket.id);
     });
 
-    socket.on('sendMessage', (msg, callback) => {
+    socket.on('sendMessage', async (msg, callback) => {
         const { toUserId, text, fromUserId, fromUsername } = msg;
         const recipientSocketInfo = onlineUsers.get(toUserId);
-        
-        if (recipientSocketInfo) {
-            io.to(recipientSocketInfo.socketId).emit('receiveMessage', msg);
-            console.log(`Message sent to user ${toUserId}: ${text}`);
-        } else {
-            console.log(`User ${toUserId} is not online.`);
-        }
+        let newMessage = null;
 
-        callback({ status: 'ok' });
+        try {
+            newMessage = new Message({
+                toUserId,
+                fromUserId,
+                text,
+                fromUsername,
+                status: 'sent'
+            });
+
+            await newMessage.save();
+
+            if (recipientSocketInfo) {
+                io.to(recipientSocketInfo.socketId).emit('receiveMessage', newMessage);
+                console.log(`Message sent to user ${toUserId}: ${text}`);
+            } else {
+                console.log(`User ${toUserId} is not online.`);
+            }
+
+            callback({ status: 'ok' });
+        } catch (error) {
+            console.error('Error saving message:', error);
+            callback({ status: 'error', error: error.message });
+        }
     });
+
+    socket.on('refreshFriends', (data) => {
+        const { sourceId, targetId } = data;
+        const sourceSocketInfo = onlineUsers.get(sourceId);
+
+        if (sourceSocketInfo) {
+            io.to(sourceSocketInfo.socketId).emit('refreshFriends');
+        }
+        
+        const targetSocketInfo = onlineUsers.get(targetId);
+        
+        if (targetSocketInfo) {
+            io.to(targetSocketInfo.socketId).emit('refreshFriends');
+        }
+    })
+
+    socket.on('refreshRequests', (data) => {
+        const { targetId } = data;
+        const targetSocketInfo = onlineUsers.get(targetId);
+
+        if (targetSocketInfo) {
+            io.to(targetSocketInfo.socketId).emit('refreshRequests');
+            console.log('Sent refreshRequests to user:', targetId);
+        }
+    })
+
+
+    socket.on('messageReceived', async (msg, callback) => {
+        const { fromUserId, toUserId, fromUsername, text, _id } = msg;
+        const newStatus = 'received';
+        
+        try {
+            const updatedMessage = await Message.findByIdAndUpdate(
+                _id,
+                { status: newStatus },
+                { new: true }
+            );
+
+            if (updatedMessage) {
+                callback({ status: 'ok', updatedMessage });
+            } else {
+                callback({ status: 'error', error: 'Message not found' });
+            }
+        } catch (error) {
+            console.error('Error updating message status:', error);
+            callback({ status: 'error', error: error.message });
+        }
+    });
+
 });
 
 server.listen(3030, () => {

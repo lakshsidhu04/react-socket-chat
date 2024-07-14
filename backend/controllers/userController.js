@@ -15,19 +15,20 @@ exports.sendFriendRequest = async (req, res) => {
         const {targetId, sourceId} = req.body;
         const sender = await User.findById(sourceId);
         const recipient = await User.findById(targetId);
-
+        
         if (!recipient) {
             return res.status(404).json({ error: "User not found" });
         }
-
+        
         if (recipient.requests.includes(sourceId)) {
             return res.status(400).json({ error: "Friend request already sent" });
         }
 
         recipient.requests.push(sourceId);
+        console.log(recipient.requests);
         await recipient.save();
-
-        res.status(200).json({ status: "Friend request sent" });
+        
+        res.status(200).json({ status: "ok" });
     } catch (error) {
         console.error("Error in sendFriendRequest: ", error.message);
         res.status(500).json({ error: "Internal server error" });
@@ -53,7 +54,7 @@ exports.receiveFriendRequest = async (req, res) => {
         user.friends.push(sender._id);
         user.requests = user.requests.filter(id => id.toString() !== sender._id.toString());
         sender.friends.push(user._id);
-
+        
         await user.save();
         await sender.save();
         
@@ -129,10 +130,33 @@ exports.removeFriend = async (req, res) => {
 
         await user.save();
         await friend.save();
-
+        
         res.status(200).json({ status: "Friend removed" });
     } catch (error) {
         console.error("Error in removeFriend: ", error.message);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+exports.rejectFriendRequest = async (req, res) => {
+    try {
+        const targetId = req.body.targetId;
+        const sourceId = req.body.sourceId;
+
+        const user = await User.findById(targetId);
+        const sender = await User.findById(sourceId);
+
+        if (!user || !sender) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        user.requests = user.requests.filter(requestId => requestId.toString() !== sourceId);
+        await user.save();
+
+        res.status(200).json({ status: "Friend request rejected" });
+    }
+    catch (error) {
+        console.error("Error in rejectFriendRequest: ", error.message);
         res.status(500).json({ error: "Internal server error" });
     }
 }

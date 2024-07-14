@@ -15,7 +15,7 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [allMessages, setAllMessages] = useState([]);
-
+    
     const connectSocket = (user) => {
         if (!socket) {
             const newSocket = io('http://localhost:3030', {

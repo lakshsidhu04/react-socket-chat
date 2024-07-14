@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useUser } from '../contexts/UserContext';
 import { Link } from 'react-router-dom';
+import { useSocket } from '../contexts/SocketContext';
 
 const PendingFriendRequests = () => {
     const { user } = useUser();
+    const { socket } = useSocket();
     const [requests, setRequests] = useState([]);
-    console.log('user:', user);
+
     useEffect(() => {
         const fetchPendingRequests = async () => {
             try {
@@ -39,17 +41,41 @@ const PendingFriendRequests = () => {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify({ sourceId : userId, targetId: user._id})
+                body: JSON.stringify({ sourceId: userId, targetId: user._id })
             });
 
             if (response.ok) {
                 console.log('Friend request accepted');
                 setRequests(requests.filter(request => request._id !== userId));
+                socket.emit('refreshFriends', { sourceId: userId, targetId: user._id });
             } else {
                 console.error('Failed to accept friend request');
             }
         } catch (error) {
             console.error('Error accepting friend request:', error);
+        }
+    };
+
+    const handleRejectRequest = async (userId) => {
+        try {
+            const response = await fetch('http://localhost:3030/api/users/reject-friend-request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ sourceId: userId, targetId: user._id })
+            });
+
+            if (response.ok) {
+                console.log('Friend request rejected');
+                setRequests(requests.filter(request => request._id !== userId));
+                socket.emit('refreshRequests', { targetId: userId });
+            } else {
+                console.error('Failed to reject friend request');
+            }
+        } catch (error) {
+            console.error('Error rejecting friend request:', error);
         }
     };
 
@@ -62,12 +88,20 @@ const PendingFriendRequests = () => {
                     requests.map((request) => (
                         <li key={request._id} className="flex items-center justify-between p-2 border-b">
                             <span>{request.username}</span>
-                            <button
-                                className="px-4 py-2 bg-blue-500 text-white rounded"
-                                onClick={() => handleAcceptRequest(request._id)}
-                            >
-                                Accept
-                            </button>
+                            <div>
+                                <button
+                                    className="px-4 py-2 mr-2 bg-green-500 text-white rounded"
+                                    onClick={() => handleAcceptRequest(request._id)}
+                                >
+                                    Accept
+                                </button>
+                                <button
+                                    className="px-4 py-2 bg-red-500 text-white rounded"
+                                    onClick={() => handleRejectRequest(request._id)}
+                                >
+                                    Reject
+                                </button>
+                            </div>
                         </li>
                     ))
                 ) : (

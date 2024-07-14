@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const SideBar = ({ setTargetUser }) => {
     const { user, setUser } = useUser();
-    const { onlineUsers } = useSocket();
+    const { onlineUsers, socket } = useSocket();
     const malePic = 'https://www.w3schools.com/w3images/avatar2.png';
     const femalePic = 'https://www.w3schools.com/w3images/avatar4.png';
     const navigate = useNavigate();
@@ -52,7 +52,7 @@ const SideBar = ({ setTargetUser }) => {
                     },
                     credentials: 'include'
                 });
-                
+
                 if (response.ok) {
                     const data = await response.json();
                     setUsers(data.users);
@@ -70,19 +70,30 @@ const SideBar = ({ setTargetUser }) => {
     useEffect(() => {
         console.log('Current online users:', onlineUsers);
     }, [onlineUsers]);
-
+    
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setShowDropdown(null);
-            }
+        if (!socket) return;
+
+        const handleRefreshFriends = () => {
+            console.log('Received refreshFriends event');
+            setFetchData(!fetchData);
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+        const handleRefreshRequests = () => {
+            console.log('Received refreshRequests event');
+            setFetchData(!fetchData);
         };
-    }, [dropdownRef]);
+
+        socket.on('refreshFriends', handleRefreshFriends);
+        socket.on('refreshRequests',handleRefreshRequests);
+        return () => {
+            if (socket) {
+                socket.off('refreshFriends', handleRefreshFriends);
+                socket.off('refreshRequests', handleRefreshRequests);
+            }
+
+        };
+    }, [socket, fetchData]);
 
     const handleUserClick = (clickedUser) => {
         if (user._id === clickedUser._id) {
@@ -104,11 +115,12 @@ const SideBar = ({ setTargetUser }) => {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify({ targetId : userId, sourceId: user._id})
+                body: JSON.stringify({ targetId: userId, sourceId: user._id })
             });
 
             if (response.ok) {
                 console.log('Friend request sent');
+                socket.emit('refreshRequests', { targetId: userId });
             } else {
                 console.error('Failed to send friend request');
             }
@@ -116,7 +128,7 @@ const SideBar = ({ setTargetUser }) => {
             console.error('Error sending friend request:', error);
         }
     };
-    
+
     const handleRemoveFriend = async (userId) => {
         console.log('Removing friend:', userId);
         try {
@@ -126,7 +138,7 @@ const SideBar = ({ setTargetUser }) => {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify({ targetId: userId, sourceId: user._id})
+                body: JSON.stringify({ targetId: userId, sourceId: user._id })
             });
 
             if (response.ok) {
@@ -162,9 +174,9 @@ const SideBar = ({ setTargetUser }) => {
             console.error('An error occurred during logout:', error);
         }
     };
-    
+
     const filteredOnlineUsers = onlineUsers.filter(userInfo => userInfo.userId !== user._id && !friends.some(friend => friend._id === userInfo.userId));
-    
+
     return (
         <div className="h-full p-4 bg-[#000e14] text-white">
             <div className="flex items-center justify-between mb-4">
