@@ -46,7 +46,7 @@ exports.receiveFriendRequest = async (req, res) => {
         if (!user || !sender) {
             return res.status(404).json({ error: "User not found" });
         }
-
+        
         if (!user.requests.includes(sender._id)) {
             return res.status(400).json({ error: "Friend request not found" });
         }
@@ -99,19 +99,24 @@ exports.getPendingRequests = async (req, res) => {
 
 exports.setProfilePic = async (req, res) => {
     try {
-        const { profilePic } = req.body;
-        const loggedInUserId = req.user._id;
+        if (!req.file) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
 
-        const user = await User.findById(loggedInUserId);
-        user.profilePic = profilePic;
+        const userId = req.user._id;
+
+        const user = await User.findById(userId);
+        user.profilePic.data = req.file.buffer;
+        user.profilePic.contentType = req.file.mimetype;
+
         await user.save();
 
-        res.status(200).json({ status: "Profile picture updated" });
+        res.status(200).json({ status: "Profile picture updated", profilePic: user.profilePic });
     } catch (error) {
         console.error("Error in setProfilePic: ", error.message);
         res.status(500).json({ error: "Internal server error" });
     }
-}
+};
 
 exports.removeFriend = async (req, res) => {
     try {

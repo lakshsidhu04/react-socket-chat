@@ -8,14 +8,15 @@ import { Link, useNavigate } from 'react-router-dom';
 const SideBar = ({ setTargetUser }) => {
     const { user, setUser } = useUser();
     const { onlineUsers, socket } = useSocket();
-    const malePic = 'https://www.w3schools.com/w3images/avatar2.png';
-    const femalePic = 'https://www.w3schools.com/w3images/avatar4.png';
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(null);
     const dropdownRef = useRef(null);
     const [friends, setFriends] = useState([]);
     const [users, setUsers] = useState([]);
     const [fetchData, setFetchData] = useState(false);
+    const defaultProfilePic = 'https://www.w3schools.com/w3images/avatar2.png'; 
+    const malePic = 'https://www.w3schools.com/w3images/avatar2.png'; 
+    const femalePic = 'https://www.w3schools.com/w3images/avatar6.png'; 
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -70,7 +71,7 @@ const SideBar = ({ setTargetUser }) => {
     useEffect(() => {
         console.log('Current online users:', onlineUsers);
     }, [onlineUsers]);
-    
+
     useEffect(() => {
         if (!socket) return;
 
@@ -85,7 +86,7 @@ const SideBar = ({ setTargetUser }) => {
         };
 
         socket.on('refreshFriends', handleRefreshFriends);
-        socket.on('refreshRequests',handleRefreshRequests);
+        socket.on('refreshRequests', handleRefreshRequests);
         return () => {
             if (socket) {
                 socket.off('refreshFriends', handleRefreshFriends);
@@ -214,7 +215,10 @@ const SideBar = ({ setTargetUser }) => {
                         >
                             <div className="flex items-center">
                                 <img
-                                    src={friend.gender === "Male" ? malePic : femalePic}
+                                    src={friend.profilePic && friend.profilePic.data
+                                        ? `data:${friend.profilePic.contentType};base64,${Buffer.from(friend.profilePic.data).toString('base64')}`
+                                        : (friend.gender === "Male" ? malePic : femalePic)
+                                    }
                                     alt="user-profile"
                                     className="w-8 h-8 rounded-full mr-2"
                                 />
@@ -272,7 +276,10 @@ const SideBar = ({ setTargetUser }) => {
                         >
                             <div className="flex items-center">
                                 <img
-                                    src={userInfo.gender === "Male" ? malePic : femalePic}
+                                    src={userInfo.profilePic && userInfo.profilePic.data
+                                        ? `data:${userInfo.profilePic.contentType};base64,${Buffer.from(userInfo.profilePic.data).toString('base64')}`
+                                        : (userInfo.gender === "Male" ? malePic : femalePic)
+                                    }
                                     alt="user-profile"
                                     className="w-8 h-8 rounded-full mr-2"
                                 />

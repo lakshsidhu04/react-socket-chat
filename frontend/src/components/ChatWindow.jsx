@@ -7,9 +7,9 @@ const ChatWindow = ({ targetUser }) => {
     const { socket, allMessages, setAllMessages } = useSocket();
     const { user } = useUser();
     const chatWindowRef = useRef(null);
-    const malePic = 'https://www.w3schools.com/w3images/avatar2.png';
-    const femalePic = 'https://www.w3schools.com/w3images/avatar4.png';
-
+    const defaultProfilePic = 'https://www.w3schools.com/w3images/avatar2.png';
+    const malePic = 'https://www.w3schools.com/w3images/avatar2.png'
+    const femalePic = 'https://www.w3schools.com/w3images/avatar6.png'
     const handleSendMessage = (newMessage) => {
         if (newMessage.trim() === '' || user._id === targetUser._id) {
             return;
@@ -81,7 +81,10 @@ const ChatWindow = ({ targetUser }) => {
                 <div className="flex items-center justify-between w-full p-2 rounded-lg bg-[#00293D] text-white shadow-lg">
                     <div className="flex items-center">
                         <img
-                            src={targetUser.gender === 'Male' ? malePic : femalePic}
+                            src={targetUser.profilePic && targetUser.profilePic.data
+                                ? `data:${targetUser.profilePic.contentType};base64,${Buffer.from(targetUser.profilePic.data).toString('base64')}`
+                                : (targetUser.gender === 'Male' ? defaultProfilePic : femalePic)
+                            }
                             alt="profile"
                             className="w-10 h-10 rounded-full mr-4"
                         />
@@ -99,8 +102,8 @@ const ChatWindow = ({ targetUser }) => {
                     >
                         <div
                             className={`max-w-lg p-3 ${msg.fromUserId === user._id
-                                    ? 'bg-gradient-to-tr from-cyan-600 to-violet-800 text-white self-end rounded-br-xl rounded-tl-xl rounded-bl-xl'
-                                    : 'bg-gradient-to-br from-red-800 to-pink-400 text-white self-start rounded-bl-xl rounded-tr-xl rounded-br-xl'
+                                ? 'bg-gradient-to-tr from-cyan-600 to-violet-800 text-white self-end rounded-br-xl rounded-tl-xl rounded-bl-xl'
+                                : 'bg-gradient-to-br from-red-800 to-pink-400 text-white self-start rounded-bl-xl rounded-tr-xl rounded-br-xl'
                                 }`}
                         >
                             <strong>{msg.fromUserId === user._id ? 'You' : msg.fromUsername}</strong>
